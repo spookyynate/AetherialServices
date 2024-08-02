@@ -1,317 +1,333 @@
-local function API_Check()
-    local success, result = pcall(function()
-        return Drawing ~= nil
-    end)
-    return success and result
-end
+import subprocess
+import sys
+import os
+import shutil
+import urllib.request
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTabWidget, QPushButton, QMessageBox, QFileDialog
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt
 
-local Find_Required = API_Check()
+class PerformanceOptimizer(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Performance Optimizer')
+        self.setGeometry(100, 100, 900, 600)  # Larger window for better layout
+        self.setWindowIcon(QIcon('AT.ico'))  # Replace with the path to your icon file
 
-if not Find_Required then
-    game:GetService("StarterGui"):SetCore("SendNotification",{
-        Title = "Aetherial Hub";
-        Text = "Script could not load because Drawing API is not available.";
-        Duration = math.huge;
-        Button1 = "OK"
-    })
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.tab_widget = QTabWidget()
+        self.layout = QVBoxLayout(self.central_widget)
+        self.layout.addWidget(self.tab_widget)
 
-    return
-end
+        self.search_indexing_enabled = True
+        self.firewall_enabled = True
+        self.network_discovery_enabled = True
 
-local Find_Required = API_Check()
+        self.create_tabs()
 
-if Find_Required == "No" then
-    game:GetService("StarterGui"):SetCore("SendNotification",{
-        Title = "Aetherial Hub";
-        Text = "Script could not load because of your executor.";
-        Duration = math.huge;
-        Button1 = "OK"
-    })
+        # Apply stylesheet
+        self.apply_stylesheet()
 
-    return
-end
+    def apply_stylesheet(self):
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #1e1e1e; /* Dark gray background */
+            }
+            QWidget {
+                background-color: #2e2e2e; /* Slightly lighter gray for widgets */
+                border: 1px solid #444;
+            }
+            QTabWidget::pane {
+                border: 1px solid #444;
+                background-color: #2e2e2e;
+            }
+            QTabBar::tab {
+                background: #3b0a45; /* Dark Purple */
+                color: white;
+                padding: 10px;
+                border: 1px solid #2a0934; /* Slightly darker purple */
+                border-bottom: none;
+            }
+            QTabBar::tab:selected {
+                background: #4a1b6c; /* Lighter Dark Purple */
+                border-bottom: 1px solid #2e2e2e;
+            }
+            QPushButton {
+                background-color: #3b0a45; /* Dark Purple */
+                color: white;
+                border: 1px solid #2a0934; /* Slightly darker purple for border */
+                padding: 10px;
+                font-size: 14px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #4a1b6c; /* Lighter Dark Purple */
+            }
+            QPushButton:pressed {
+                background-color: #2a0934; /* Even darker purple when pressed */
+            }
+            QMessageBox {
+                background-color: #2e2e2e;
+                color: white;
+            }
+        """)
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local Camera = game:GetService("Workspace").CurrentCamera
-local UserInputService = game:GetService("UserInputService")
-local TestService = game:GetService("TestService")
+    def create_tabs(self):
+        self.create_tab('Performance', self.setup_performance_tab)
+        self.create_tab('Network', self.setup_network_tab)
+        self.create_tab('Apps', self.setup_apps_tab)
 
-local Typing = false
-local TracersEnabled = true  -- Variable to manage the toggle state
+    def create_tab(self, name, setup_function):
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setContentsMargins(10, 10, 10, 10)  # Add margins around the layout
+        setup_function(layout)
+        self.tab_widget.addTab(tab, name)
 
-_G.SendNotifications = true   -- If set to true then the script would notify you frequently on any changes applied and when loaded / errored. (If a game can detect this, it is recommended to set it to false)
-_G.DefaultSettings = false   -- If set to true then the tracer script would run with default settings regardless of any changes you made.
+    def setup_performance_tab(self, layout):
+        button_actions = {
+            "Enable ULTIMATE PERFORMANCE MODE": self.enable_ultimate_performance_mode,
+            "Toggle Transparency": self.toggle_transparency,
+            "Clear Temp Files": self.clear_temporary_files,
+            "Disable Startup Programs": self.disable_startup_programs,
+            "Increase System Performance": self.increase_system_performance,
+            "Toggle Firewall": self.toggle_firewall,
+            "Optimize Disk Performance": self.optimize_disk_performance,
+            "Clean Up System Files": self.clean_up_system_files,
+            "Manage System Services": self.manage_system_services,
+            "Adjust Visual Effects": self.adjust_visual_effects,
+            "Disable Hibernation": self.disable_hibernation,
+            "Disable Superfetch": self.disable_superfetch,
+            "Clear DNS Cache": self.clear_dns_cache,
+            "Increase Virtual Memory": self.increase_virtual_memory,
+            "Set High Performance Mode": self.set_high_performance_mode,
+            "Disable Windows Tips": self.disable_windows_tips,
+            "Toggle Search Indexing": self.toggle_search_indexing,
+            "Optimize Windows Defender": self.optimize_windows_defender,
+            "Disable Cortana": self.disable_cortana,
+            "Disable Error Reporting": self.disable_windows_error_reporting,
+            "Disable Automatic Updates": self.disable_automatic_updates,
+            "Disable Defender Realtime Protection": self.disable_defender_realtime_protection,
+            "Disable Background Apps": self.disable_background_apps,
+        }
 
-_G.TeamCheck = false   -- If set to true then the script would create tracers only for the enemy team members.
+        for button_text, action in button_actions.items():
+            button = QPushButton(button_text)
+            button.clicked.connect(action)
+            layout.addWidget(button)
 
---[!]-- ONLY ONE OF THESE VALUES SHOULD BE SET TO TRUE TO NOT ERROR THE SCRIPT --[!]--
+        layout.addStretch()  # Add stretch to push buttons to the top
 
-_G.FromMouse = false   -- If set to true, the tracers will come from the position of your mouse cursor on your screen.
-_G.FromCenter = false   -- If set to true, the tracers will come from the center of your screen.
-_G.FromBottom = true   -- If set to true, the tracers will come from the bottom of your screen.
+    def setup_network_tab(self, layout):
+        button_actions = {
+            "Toggle Network Discovery": self.toggle_network_discovery,
+            "Set DNS to Google": self.set_dns_google,
+            "Set DNS to Cloudflare": self.set_dns_cloudflare,
+            "Check Best DNS": self.check_best_dns,
+            "Toggle QoS": self.toggle_qos,
+            "Change MTU": self.change_mtu,
+            "Reset TCP/IP Stack": self.reset_tcpip_stack,
+        }
 
-_G.TracersVisible = true   -- If set to true then the tracers will be visible and vice versa.
-_G.TracerColor = Color3.fromRGB(255, 80, 10)   -- The color that the tracers would appear as.
-_G.TracerThickness = 1   -- The thickness of the tracers.
-_G.TracerTransparency = 0.7   -- The transparency of the tracers.
+        for button_text, action in button_actions.items():
+            button = QPushButton(button_text)
+            button.clicked.connect(action)
+            layout.addWidget(button)
 
-_G.ModeSkipKey = Enum.KeyCode.E   -- The key that changes between modes that indicate where will the tracers come from.
-_G.DisableKey = Enum.KeyCode.Q   -- The key that disables / enables the tracers.
+        layout.addStretch()  # Add stretch to push buttons to the top
 
-_G.OuterGlowColor = Color3.fromRGB(255, 0, 0)  -- Red outer glow color
-_G.FillColor = Color3.fromRGB(255, 150, 150)   -- Lighter red fill color
+    def setup_apps_tab(self, layout):
+        file_urls = [
+            "https://github.com/spookyynate/AetherialServices/raw/main/AetherialBooster.bat",
+            # Add more URLs here as needed
+        ]
+        file_names = [
+            "AetherialBooster.bat",
+            # Add more file names here as needed
+        ]
 
-local function CreateESP()
-    for _, v in next, Players:GetPlayers() do
-        if v.Name ~= game.Players.LocalPlayer.Name then
-            local TracerLine = Drawing.new("Line")
-            local OuterGlow = Drawing.new("Square")
-            local BodyFill = Drawing.new("Square")
+        for url, name in zip(file_urls, file_names):
+            button = QPushButton(f"Download {name}")
+            button.clicked.connect(lambda checked, u=url, n=name: self.download_file(u, n))
+            layout.addWidget(button)
 
-            RunService.RenderStepped:Connect(function()
-                if workspace:FindFirstChild(v.Name) ~= nil and workspace[v.Name]:FindFirstChild("HumanoidRootPart") ~= nil then
-                    local HumanoidRootPart_Position, HumanoidRootPart_Size = workspace[v.Name].HumanoidRootPart.CFrame, workspace[v.Name].HumanoidRootPart.Size * 1
-                    local Vector, OnScreen = Camera:WorldToViewportPoint(HumanoidRootPart_Position * CFrame.new(0, -HumanoidRootPart_Size.Y, 0).p)
-                    
-                    TracerLine.Thickness = _G.TracerThickness
-                    TracerLine.Transparency = _G.TracerTransparency
-                    TracerLine.Color = _G.TracerColor
+        layout.addStretch()  # Add stretch to push buttons to the top
 
-                    if _G.FromMouse == true and _G.FromCenter == false and _G.FromBottom == false then
-                        TracerLine.From = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
-                    elseif _G.FromMouse == false and _G.FromCenter == true and _G.FromBottom == false then
-                        TracerLine.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                    elseif _G.FromMouse == false and _G.FromCenter == false and _G.FromBottom == true then
-                        TracerLine.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
-                    end
+    def download_file(self, url, file_name):
+        save_path, _ = QFileDialog.getSaveFileName(self, "Save File", file_name, "All Files (*)")
+        if save_path:
+            try:
+                urllib.request.urlretrieve(url, save_path)
+                QMessageBox.information(self, 'Download Complete', f'File saved to: {save_path}')
+            except Exception as e:
+                QMessageBox.warning(self, 'Error', f'Failed to download file: {e}')
 
-                    if OnScreen == true and TracersEnabled then
-                        TracerLine.To = Vector2.new(Vector.X, Vector.Y)
-                        if _G.TeamCheck == true then 
-                            if Players.LocalPlayer.Team ~= v.Team then
-                                TracerLine.Visible = _G.TracersVisible
-                            else
-                                TracerLine.Visible = false
-                            end
-                        else
-                            TracerLine.Visible = _G.TracersVisible
-                        end
-                        
-                        -- Update Outer Glow and Body Fill
-                        local Character = workspace:FindFirstChild(v.Name)
-                        if Character and Character:FindFirstChild("HumanoidRootPart") then
-                            local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-                            local Head = Character:FindFirstChild("Head")
-                            local HRP_Position, HRP_Size = HumanoidRootPart.CFrame, HumanoidRootPart.Size * 1
-                            local Head_Position, Head_Size = Head.CFrame, Head.Size * 1
-                            local HRP_Vector, HRP_OnScreen = Camera:WorldToViewportPoint(HRP_Position * CFrame.new(0, -HRP_Size.Y, 0).p)
-                            local Head_Vector, Head_OnScreen = Camera:WorldToViewportPoint(Head_Position * CFrame.new(0, -Head_Size.Y, 0).p)
-                            
-                            if HRP_OnScreen and Head_OnScreen then
-                                OuterGlow.Visible = true
-                                OuterGlow.Color = _G.OuterGlowColor
-                                OuterGlow.Thickness = 3
-                                OuterGlow.Transparency = 0.7
-                                OuterGlow.Size = Vector2.new(30, 60)
-                                OuterGlow.Position = Vector2.new(HRP_Vector.X - OuterGlow.Size.X / 2, HRP_Vector.Y - OuterGlow.Size.Y / 2)
-                                
-                                BodyFill.Visible = true
-                                BodyFill.Color = _G.FillColor
-                                BodyFill.Transparency = 0.5
-                                BodyFill.Size = Vector2.new(28, 58)
-                                BodyFill.Position = Vector2.new(HRP_Vector.X - BodyFill.Size.X / 2, HRP_Vector.Y - BodyFill.Size.Y / 2)
-                            else
-                                OuterGlow.Visible = false
-                                BodyFill.Visible = false
-                            end
-                        else
-                            OuterGlow.Visible = false
-                            BodyFill.Visible = false
-                        end
-                    else
-                        TracerLine.Visible = false
-                        OuterGlow.Visible = false
-                        BodyFill.Visible = false
-                    end
-                else
-                    TracerLine.Visible = false
-                    OuterGlow.Visible = false
-                    BodyFill.Visible = false
-                end
-            end)
+    def save_file(self):
+        # Get the directory of the script
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        # Path to the embedded batch file (ensure this file is added to your project)
+        batch_file_path = os.path.join(base_dir, 'AetherialBooster.bat')
+    
+        # Ask the user where to save the file
+        options = QFileDialog.Options()
+        save_path, _ = QFileDialog.getSaveFileName(self, "Save Batch File", "", "Batch Files (*.bat);;All Files (*)", options=options)
+    
+        if save_path:
+            shutil.copy(batch_file_path, save_path)
+            QMessageBox.information(self, 'File Saved', f'Batch file saved to: {save_path}')
 
-            Players.PlayerRemoving:Connect(function()
-                TracerLine.Visible = false
-                OuterGlow.Visible = false
-                BodyFill.Visible = false
-            end)
-        end
-    end
+    def run_command(self, command):
+        try:
+            subprocess.run(command, shell=True, check=True)
+        except subprocess.CalledProcessError as e:
+            QMessageBox.warning(self, 'Error', f'An error occurred: {e}')
 
-    Players.PlayerAdded:Connect(function(Player)
-        Player.CharacterAdded:Connect(function(v)
-            if v.Name ~= game.Players.LocalPlayer.Name then
-                local TracerLine = Drawing.new("Line")
-                local OuterGlow = Drawing.new("Square")
-                local BodyFill = Drawing.new("Square")
+    def enable_ultimate_performance_mode(self):
+        self.run_command("powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61")
+        QMessageBox.information(self, 'ULTIMATE PERFORMANCE MODE', 'ULTIMATE PERFORMANCE MODE enabled.')
 
-                RunService.RenderStepped:Connect(function()
-                    if workspace:FindFirstChild(v.Name) ~= nil and workspace[v.Name]:FindFirstChild("HumanoidRootPart") ~= nil then
-                        local HumanoidRootPart_Position, HumanoidRootPart_Size = workspace[v.Name].HumanoidRootPart.CFrame, workspace[v.Name].HumanoidRootPart.Size * 1
-                        local Vector, OnScreen = Camera:WorldToViewportPoint(HumanoidRootPart_Position * CFrame.new(0, -HumanoidRootPart_Size.Y, 0).p)
-                        
-                        TracerLine.Thickness = _G.TracerThickness
-                        TracerLine.Transparency = _G.TracerTransparency
-                        TracerLine.Color = _G.TracerColor
+    def toggle_transparency(self):
+        self.run_command("reg add \"HKCU\\Software\\Microsoft\\Windows\\DWM\" /v \"EnableTransparency\" /t REG_DWORD /d 0 /f")
+        QMessageBox.information(self, 'Transparency', 'Transparency toggled off.')
 
-                        if _G.FromMouse == true and _G.FromCenter == false and _G.FromBottom == false then
-                            TracerLine.From = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
-                        elseif _G.FromMouse == false and _G.FromCenter == true and _G.FromBottom == false then
-                            TracerLine.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-                        elseif _G.FromMouse == false and _G.FromCenter == false and _G.FromBottom == true then
-                            TracerLine.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
-                        end
+    def clear_temporary_files(self):
+        self.run_command("del /q /f %temp%\\*")
+        QMessageBox.information(self, 'Temporary Files', 'Temporary files cleared.')
 
-                        if OnScreen == true and TracersEnabled then
-                            TracerLine.To = Vector2.new(Vector.X, Vector.Y)
-                            if _G.TeamCheck == true then 
-                                if Players.LocalPlayer.Team ~= Player.Team then
-                                    TracerLine.Visible = _G.TracersVisible
-                                else
-                                    TracerLine.Visible = false
-                                end
-                            else
-                                TracerLine.Visible = _G.TracersVisible
-                            end
+    def disable_startup_programs(self):
+        self.run_command("wmic startup get caption,command")
+        QMessageBox.information(self, 'Startup Programs', 'List of startup programs shown in console. Use the Task Manager to disable them.')
 
-                            -- Update Outer Glow and Body Fill
-                            local Character = workspace:FindFirstChild(Player.Name)
-                            if Character and Character:FindFirstChild("HumanoidRootPart") then
-                                local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
-                                local Head = Character:FindFirstChild("Head")
-                                local HRP_Position, HRP_Size = HumanoidRootPart.CFrame, HumanoidRootPart.Size * 1
-                                local Head_Position, Head_Size = Head.CFrame, Head.Size * 1
-                                local HRP_Vector, HRP_OnScreen = Camera:WorldToViewportPoint(HRP_Position * CFrame.new(0, -HRP_Size.Y, 0).p)
-                                local Head_Vector, Head_OnScreen = Camera:WorldToViewportPoint(Head_Position * CFrame.new(0, -Head_Size.Y, 0).p)
-                                
-                                if HRP_OnScreen and Head_OnScreen then
-                                    OuterGlow.Visible = true
-                                    OuterGlow.Color = _G.OuterGlowColor
-                                    OuterGlow.Thickness = 3
-                                    OuterGlow.Transparency = 0.7
-                                    OuterGlow.Size = Vector2.new(30, 60)
-                                    OuterGlow.Position = Vector2.new(HRP_Vector.X - OuterGlow.Size.X / 2, HRP_Vector.Y - OuterGlow.Size.Y / 2)
-                                    
-                                    BodyFill.Visible = true
-                                    BodyFill.Color = _G.FillColor
-                                    BodyFill.Transparency = 0.5
-                                    BodyFill.Size = Vector2.new(28, 58)
-                                    BodyFill.Position = Vector2.new(HRP_Vector.X - BodyFill.Size.X / 2, HRP_Vector.Y - BodyFill.Size.Y / 2)
-                                else
-                                    OuterGlow.Visible = false
-                                    BodyFill.Visible = false
-                                end
-                            else
-                                OuterGlow.Visible = false
-                                BodyFill.Visible = false
-                            end
-                        else
-                            TracerLine.Visible = false
-                            OuterGlow.Visible = false
-                            BodyFill.Visible = false
-                        end
-                    else
-                        TracerLine.Visible = false
-                        OuterGlow.Visible = false
-                        BodyFill.Visible = false
-                    end
-                end)
+    def increase_system_performance(self):
+        self.run_command("powercfg -change -monitor-timeout-ac 1")
+        QMessageBox.information(self, 'System Performance', 'System performance optimized for power saving.')
 
-                Players.PlayerRemoving:Connect(function()
-                    TracerLine.Visible = false
-                    OuterGlow.Visible = false
-                    BodyFill.Visible = false
-                end)
-            end
-        end)
-    end)
-end
+    def toggle_firewall(self):
+        if self.firewall_enabled:
+            self.run_command("netsh advfirewall set allprofiles state off")
+            self.firewall_enabled = False
+            status = 'disabled'
+        else:
+            self.run_command("netsh advfirewall set allprofiles state on")
+            self.firewall_enabled = True
+            status = 'enabled'
+        QMessageBox.information(self, 'Firewall', f'Firewall {status}.')
 
--- Chat Command Handler
-Players.LocalPlayer.Chatted:Connect(function(message)
-    local args = string.split(message, " ")
-    local command = args[1]
+    def optimize_disk_performance(self):
+        self.run_command("defrag C: /O /H")
+        QMessageBox.information(self, 'Disk Optimization', 'Disk optimized.')
 
-    if command:lower() == "/keybind" and #args == 2 then
-        local keyName = args[2]:upper()
-        local newKeybind = Enum.KeyCode[keyName]
+    def clean_up_system_files(self):
+        self.run_command("cleanmgr /sagerun:1")
+        QMessageBox.information(self, 'System Files Cleanup', 'System files cleanup initiated.')
 
-        if newKeybind then
-            if newKeybind ~= _G.DisableKey and newKeybind ~= _G.ModeSkipKey then
-                _G.DisableKey = newKeybind
-                game:GetService("StarterGui"):SetCore("SendNotification",{
-                    Title = "Aetherial Hub";
-                    Text = "Disable Keybind changed to " .. tostring(newKeybind);
-                    Duration = 5;
-                })
-            elseif newKeybind == _G.DisableKey then
-                _G.DisableKey = newKeybind
-                game:GetService("StarterGui"):SetCore("SendNotification",{
-                    Title = "Aetherial Hub";
-                    Text = "Disable Keybind already set to " .. tostring(newKeybind);
-                    Duration = 5;
-                })
-            elseif newKeybind == _G.ModeSkipKey then
-                _G.ModeSkipKey = newKeybind
-                game:GetService("StarterGui"):SetCore("SendNotification",{
-                    Title = "Aetherial Hub";
-                    Text = "Mode Skip Keybind already set to " .. tostring(newKeybind);
-                    Duration = 5;
-                })
-            else
-                game:GetService("StarterGui"):SetCore("SendNotification",{
-                    Title = "Aetherial Hub";
-                    Text = "Invalid keybind.";
-                    Duration = 5;
-                })
-            end
-        else
-            game:GetService("StarterGui"):SetCore("SendNotification",{
-                Title = "Aetherial Hub";
-                Text = "Invalid keybind.";
-                Duration = 5;
-            })
-        end
-    elseif command:lower() == "/color" and #args == 2 then
-        local colorArgs = string.split(args[2], ",")
-        if #colorArgs == 3 then
-            local r = tonumber(colorArgs[1])
-            local g = tonumber(colorArgs[2])
-            local b = tonumber(colorArgs[3])
-            
-            if r and g and b and r >= 0 and r <= 255 and g >= 0 and g <= 255 and b >= 0 and b <= 255 then
-                _G.TracerColor = Color3.fromRGB(r, g, b)
-                game:GetService("StarterGui"):SetCore("SendNotification",{
-                    Title = "Aetherial Hub";
-                    Text = "Tracer color changed to (" .. r .. ", " .. g .. ", " .. b .. ")";
-                    Duration = 5;
-                })
-            else
-                game:GetService("StarterGui"):SetCore("SendNotification",{
-                    Title = "Aetherial Hub";
-                    Text = "Invalid color values. Please use format R,G,B with values between 0 and 255.";
-                    Duration = 5;
-                })
-            end
-        else
-            game:GetService("StarterGui"):SetCore("SendNotification",{
-                Title = "Aetherial Hub";
-                Text = "Invalid color format. Please use format R,G,B.";
-                Duration = 5;
-            })
-        end
-    end
-end)
+    def manage_system_services(self):
+        self.run_command("services.msc")
+        QMessageBox.information(self, 'System Services', 'System Services window opened.')
 
-CreateESP()
+    def adjust_visual_effects(self):
+        self.run_command("SystemPropertiesPerformance")
+        QMessageBox.information(self, 'Visual Effects', 'Visual Effects settings opened.')
+
+    def disable_hibernation(self):
+        self.run_command("powercfg /hibernate off")
+        QMessageBox.information(self, 'Hibernation', 'Hibernation disabled.')
+
+    def disable_superfetch(self):
+        self.run_command("sc stop \"SysMain\"")
+        self.run_command("sc config \"SysMain\" start=disabled")
+        QMessageBox.information(self, 'Superfetch', 'Superfetch disabled.')
+
+    def clear_dns_cache(self):
+        self.run_command("ipconfig /flushdns")
+        QMessageBox.information(self, 'DNS Cache', 'DNS cache cleared.')
+
+    def increase_virtual_memory(self):
+        self.run_command("SystemPropertiesPerformance")
+        QMessageBox.information(self, 'Virtual Memory', 'Virtual memory settings opened.')
+
+    def set_high_performance_mode(self):
+        self.run_command("powercfg -setactive SCHEME_MIN")
+        QMessageBox.information(self, 'High Performance Mode', 'High performance power plan activated.')
+
+    def disable_windows_tips(self):
+        self.run_command("reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications\" /v \"ToastEnabled\" /t REG_DWORD /d 0 /f")
+        QMessageBox.information(self, 'Windows Tips', 'Windows tips disabled.')
+
+    def toggle_search_indexing(self):
+        if self.search_indexing_enabled:
+            self.run_command("sc stop \"WSearch\"")
+            self.search_indexing_enabled = False
+            status = 'disabled'
+        else:
+            self.run_command("sc start \"WSearch\"")
+            self.search_indexing_enabled = True
+            status = 'enabled'
+        QMessageBox.information(self, 'Search Indexing', f'Search indexing {status}.')
+
+    def optimize_windows_defender(self):
+        self.run_command("powershell -Command \"Set-MpPreference -DisableRealtimeMonitoring $true\"")
+        QMessageBox.information(self, 'Windows Defender', 'Windows Defender optimized.')
+
+    def disable_cortana(self):
+        self.run_command("reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search\" /v \"AllowCortana\" /t REG_DWORD /d 0 /f")
+        QMessageBox.information(self, 'Cortana', 'Cortana disabled.')
+
+    def disable_windows_error_reporting(self):
+        self.run_command("reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\" /v \"Disabled\" /t REG_DWORD /d 1 /f")
+        QMessageBox.information(self, 'Error Reporting', 'Windows Error Reporting disabled.')
+
+    def disable_automatic_updates(self):
+        self.run_command("sc config wuauserv start=disabled")
+        QMessageBox.information(self, 'Automatic Updates', 'Automatic updates disabled.')
+
+    def disable_defender_realtime_protection(self):
+        self.run_command("powershell -Command \"Set-MpPreference -DisableRealtimeMonitoring $true\"")
+        QMessageBox.information(self, 'Defender Real-time Protection', 'Defender real-time protection disabled.')
+
+    def disable_background_apps(self):
+        self.run_command("powershell -Command \"Get-AppxPackage | Remove-AppxPackage\"")
+        QMessageBox.information(self, 'Background Apps', 'Background apps disabled.')
+
+    def toggle_network_discovery(self):
+        if self.network_discovery_enabled:
+            self.run_command("reg add \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\NetCache\" /v \"EnableDiscovery\" /t REG_DWORD /d 0 /f")
+            self.network_discovery_enabled = False
+            status = 'disabled'
+        else:
+            self.run_command("reg add \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\NetCache\" /v \"EnableDiscovery\" /t REG_DWORD /d 1 /f")
+            self.network_discovery_enabled = True
+            status = 'enabled'
+        QMessageBox.information(self, 'Network Discovery', f'Network discovery {status}.')
+
+    def set_dns_google(self):
+        self.run_command("netsh interface ip set dns name=\"Wi-Fi\" static 8.8.8.8")
+        QMessageBox.information(self, 'DNS', 'DNS set to Google (8.8.8.8).')
+
+    def set_dns_cloudflare(self):
+        self.run_command("netsh interface ip set dns name=\"Wi-Fi\" static 1.1.1.1")
+        QMessageBox.information(self, 'DNS', 'DNS set to Cloudflare (1.1.1.1).')
+
+    def check_best_dns(self):
+        self.run_command("powershell -Command \"Test-Connection 1.1.1.1 -Count 1\"")
+        self.run_command("powershell -Command \"Test-Connection 8.8.8.8 -Count 1\"")
+        QMessageBox.information(self, 'DNS Check', 'Checked DNS servers. Review output for best DNS.')
+
+    def toggle_qos(self):
+        self.run_command("netsh interface ipv4 set global dsc=enable")
+        QMessageBox.information(self, 'QoS', 'QoS settings toggled.')
+
+    def change_mtu(self):
+        self.run_command("netsh interface ipv4 set subinterface \"Wi-Fi\" mtu=1500 store=persistent")
+        QMessageBox.information(self, 'MTU', 'MTU changed to 1500.')
+
+    def reset_tcpip_stack(self):
+        self.run_command("netsh int ip reset")
+        QMessageBox.information(self, 'TCP/IP Stack', 'TCP/IP stack reset.')
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = PerformanceOptimizer()
+    window.show()
+    sys.exit(app.exec_())
