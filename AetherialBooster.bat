@@ -1,333 +1,974 @@
-import subprocess
-import sys
-import os
-import shutil
-import urllib.request
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QTabWidget, QPushButton, QMessageBox, QFileDialog
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
+@echo off
+@title Terabyte Tweaker
+SetLocal EnableDelayedExpansion
+mkdir C:\TT\ >nul 2>&1 & mkdir C:\TT\CoreInfo\ >nul 2>&1
+mkdir "%SystemDrive%\TT\TTRevert\" >nul 2>&1
+set load=
+set/a loadnum=5
+setlocal
+set progress=0
+set debloating=true
+set fixing=true
+set cleaning=true
+set regediting=true
+set power=true
+set clock=true
+set cpugpu=true
+set ramtweaks=true
+set internetgame=true
+color 05
 
-class PerformanceOptimizer(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle('Performance Optimizer')
-        self.setGeometry(100, 100, 900, 600)  # Larger window for better layout
-        self.setWindowIcon(QIcon('AT.ico'))  # Replace with the path to your icon file
+::Blank/Color Character
+for /F "tokens=1,2 delims=#" %%a in ('"prompt #$H#$E# & echo on & for %%b in (1) do rem"') do (set "DEL=%%a" & set "COL=%%b")
 
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        self.tab_widget = QTabWidget()
-        self.layout = QVBoxLayout(self.central_widget)
-        self.layout.addWidget(self.tab_widget)
+::Internet/Admin Checker
+ping -n 2 -w 700 google.com >nul 2>&1
+IF %ERRORLEVEL% EQU 1 (
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.    
+    echo.          
+    echo.    
+    echo.     
+    echo.   
+    echo. 
+    echo.
+    echo                            You appear to have no internet connection, try again later.
+    echo.                   
+    echo.                  
+    echo.                 
+    echo.                      
+    echo.      
+    echo. 
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.
+    echo.
+        pause & exit
+) ELSE (
+    dir "%SystemRoot%\System32\config\DRIVERS" 2>nul >nul || goto noadmin
+    goto start
+    )
 
-        self.search_indexing_enabled = True
-        self.firewall_enabled = True
-        self.network_discovery_enabled = True
+:noadmin
+color 05
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo                                          Please, run the app as an administator.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+pause & exit
 
-        self.create_tabs()
 
-        # Apply stylesheet
-        self.apply_stylesheet()
+:start
+cd %systemroot%\system32
+chcp 65001 >nul 2>&1
+cls
+:retry
+echo.
+echo.
+echo            _____            _____            _____            _____            _____  
+echo           /\    \          /\    \          /\    \          /\    \          /\    \ 
+echo          /::\____\        /::\____\        /::\____\        /::\____\        /::\____\ 
+echo         /::::\    \      /::::\    \      /::::\    \      /::::\    \      /::::\    \ 
+echo        /::::::\____\    /::::::\____\    /::::::\____\    /::::::\____\    /::::::\____\ 
+echo       /:::::::::::\    \  /:::::::::::\  /:::::::::::\  /:::::::::::\  /:::::::::::\  / 
+echo      /:::/~~~~/~~/    / /:::/~~~~/~~/  /:::/~~~~/~~/  /:::/~~~~/~~/  /:::/~~~~/~~/ 
+echo     /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /   
+echo    /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    
+echo   /:::/____/    / /:::/____/    / /:::/____/    / /:::/____/    / /:::/____/   
+echo  /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    
+echo /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /     
+echo /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /      
+echo /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /       
+echo /:::/____/    / /:::/____/    / /:::/____/    / /:::/____/    / /:::/____/        
+echo /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /         
+echo /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /          
+echo /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /           
+echo /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /    / /:::/    /            
+echo                                                                                     
+echo               %COL%[92mAetherialS%COL%[33m
+echo               *%COL%[92m All in One%COL%[33m
+echo               *%COL%[92m RAM Optimization%COL%[33m
+echo               *%COL%[92m Better VRAM Creation%COL%[33m
+echo               *%COL%[92m Cache + Log Cleaning%COL%[33m
+echo               *%COL%[92m Power Plan Tweak%COL%[33m
+echo               *%COL%[92m Regedit Tweaks%COL%[33m
+echo               *%COL%[92m Internet Tweaks%COL%[33m
+echo               *%COL%[92m Timer Resolution Services%COL%[33m
+echo               *%COL%[92m Game Specific Tweaks%COL%[33m
+echo               *%COL%[92m Server Changer%COL%[33m
+echo               *%COL%[92m System Bugfixes%COL%[33m
+echo               *%COL%[92m CPU Tweaks%COL%[33m
+echo               *%COL%[92m GPU Tweaks%COL%[33m
+echo               *%COL%[92m Mouse Tweaks%COL%[33m
+echo               *%COL%[92m Services Optimization%COL%[33m
+echo               *%COL%[92m Incredibly Small File%COL%[33m
+echo               *%COL%[92m Automatic Installation%COL%[33m
+echo               *%COL%[92m Debloater%COL%[33m
+echo               *%COL%[92m And many more...%COL%[33m
+echo.                             %COL%[92mPress [%COL%[33mY%COL%[92m] to Install the Tweaks, [%COL%[33mX%COL%[92m] to leave or [%COL%[33mC%COL%[92m] to Configure %COL%[33m
+echo.
 
-    def apply_stylesheet(self):
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #1e1e1e; /* Dark gray background */
-            }
-            QWidget {
-                background-color: #2e2e2e; /* Slightly lighter gray for widgets */
-                border: 1px solid #444;
-            }
-            QTabWidget::pane {
-                border: 1px solid #444;
-                background-color: #2e2e2e;
-            }
-            QTabBar::tab {
-                background: #3b0a45; /* Dark Purple */
-                color: white;
-                padding: 10px;
-                border: 1px solid #2a0934; /* Slightly darker purple */
-                border-bottom: none;
-            }
-            QTabBar::tab:selected {
-                background: #4a1b6c; /* Lighter Dark Purple */
-                border-bottom: 1px solid #2e2e2e;
-            }
-            QPushButton {
-                background-color: #3b0a45; /* Dark Purple */
-                color: white;
-                border: 1px solid #2a0934; /* Slightly darker purple for border */
-                padding: 10px;
-                font-size: 14px;
-                border-radius: 5px;
-            }
-            QPushButton:hover {
-                background-color: #4a1b6c; /* Lighter Dark Purple */
-            }
-            QPushButton:pressed {
-                background-color: #2a0934; /* Even darker purple when pressed */
-            }
-            QMessageBox {
-                background-color: #2e2e2e;
-                color: white;
-            }
-        """)
+SET /P choice=Choose Your Option:
+IF /I "%choice%"=="Y" Goto Loading
+IF /I "%choice%"=="y" Goto Loading
+IF /I "%choice%"=="yeah" Goto Loading
+IF /I "%choice%"=="Yes" Goto Loading
+IF /I "%choice%"=="yes" Goto Loading
+IF /I "%choice%"=="yep" Goto Loading
+IF /I "%choice%"=="C" Goto config
+IF /I "%choice%"=="c" Goto config
+IF /I "%choice%"=="X" exit
+IF /I "%choice%"=="x" exit
+cls && ECHO This is not a valid option, please try again. && pause && goto retry
 
-    def create_tabs(self):
-        self.create_tab('Performance', self.setup_performance_tab)
-        self.create_tab('Network', self.setup_network_tab)
-        self.create_tab('Apps', self.setup_apps_tab)
+:config
 
-    def create_tab(self, name, setup_function):
-        tab = QWidget()
-        layout = QVBoxLayout(tab)
-        layout.setContentsMargins(10, 10, 10, 10)  # Add margins around the layout
-        setup_function(layout)
-        self.tab_widget.addTab(tab, name)
 
-    def setup_performance_tab(self, layout):
-        button_actions = {
-            "Enable ULTIMATE PERFORMANCE MODE": self.enable_ultimate_performance_mode,
-            "Toggle Transparency": self.toggle_transparency,
-            "Clear Temp Files": self.clear_temporary_files,
-            "Disable Startup Programs": self.disable_startup_programs,
-            "Increase System Performance": self.increase_system_performance,
-            "Toggle Firewall": self.toggle_firewall,
-            "Optimize Disk Performance": self.optimize_disk_performance,
-            "Clean Up System Files": self.clean_up_system_files,
-            "Manage System Services": self.manage_system_services,
-            "Adjust Visual Effects": self.adjust_visual_effects,
-            "Disable Hibernation": self.disable_hibernation,
-            "Disable Superfetch": self.disable_superfetch,
-            "Clear DNS Cache": self.clear_dns_cache,
-            "Increase Virtual Memory": self.increase_virtual_memory,
-            "Set High Performance Mode": self.set_high_performance_mode,
-            "Disable Windows Tips": self.disable_windows_tips,
-            "Toggle Search Indexing": self.toggle_search_indexing,
-            "Optimize Windows Defender": self.optimize_windows_defender,
-            "Disable Cortana": self.disable_cortana,
-            "Disable Error Reporting": self.disable_windows_error_reporting,
-            "Disable Automatic Updates": self.disable_automatic_updates,
-            "Disable Defender Realtime Protection": self.disable_defender_realtime_protection,
-            "Disable Background Apps": self.disable_background_apps,
-        }
+cls
+echo.
+echo                                                %COL%[92m##############################
+echo                                                           %COL%[33mSettings%COL%[92m
+echo                                                ##############################
+echo.
+echo.
+echo.
+echo.
+echo     [%COL%[33m1%COL%[92m] Activate System Fixer: %COL%[33m%fixing%%COL%[92m        [%COL%[33m2%COL%[92m] Activate Cleaner: %COL%[33m%cleaning%%COL%[92m           [%COL%[33m3%COL%[92m] Activate Regedits: %COL%[33m%regediting%%COL%[92m
+echo         Highly Reccomended to keep ON,         Highly Recommended to keep ON,       Reccomended to keep On, although
+echo         Fixes System bugs and Problems         Cleans System cache, logs and        not neecessary in most games.
+echo         Automatically.                         Internet Cache Automatically.        Makes some games faster.
+echo.
+echo     [%COL%[33m4%COL%[92m] Activate Debloating: %COL%[33m%debloating%%COL%[92m          [%COL%[33m5%COL%[92m] Activate Power Plan: %COL%[33m%power%%COL%[92m        [%COL%[33m6%COL%[92m] Clock Resolution Services: %COL%[33m%clock%%COL%[92m
+echo         Uninstall Factory Bloatware and        Not recommended for notebooks,       Reccomended to keep On, may
+echo         Services from your system without      tweaks power plan for better         not be 100%% automatic like
+echo         breaking the microsoft store.          peformance using more energy.        the other tweaks.
+echo.     
+echo     [%COL%[33m7%COL%[92m] Activate CPU and GPU Tweaks: %COL%[33m%cpugpu%%COL%[92m  [%COL%[33m8%COL%[92m] Activate RAM Tweaks: %COL%[33m%ramtweaks%%COL%[92m        [%COL%[33m9%COL%[92m] Internet and Game Tweaks: %COL%[33m%internetgame%%COL%[92m
+echo         Highly Reccomended to keep ON,         Highly Reccomended to keep ON,       Highly Reccomended to keep ON,
+echo         Automatically tweaks software for      Makes the ram work in blocks         Better Internet connection and
+echo         best peformance.                       for higher peformance.               Ping, together with FPS.
+echo.
+echo.
+echo.
+echo.
+echo                                               %COL%[92mPress [%COL%[33mX%COL%[92m] to go back to the menu.%COL%[33m
+echo.
+echo.
+SET /P choice=Select your settings:
+IF /I "%choice%"=="1" ( 
+  if "%fixing%"=="true" (
+    set fixing=false
+    ) else set fixing=true
+) && goto config
 
-        for button_text, action in button_actions.items():
-            button = QPushButton(button_text)
-            button.clicked.connect(action)
-            layout.addWidget(button)
+IF /I "%choice%"=="2" ( 
+  if "%cleaning%"=="true" (
+    set cleaning=false
+    ) else set cleaning=true
+) && goto config
 
-        layout.addStretch()  # Add stretch to push buttons to the top
+IF /I "%choice%"=="3" ( 
+  if "%regediting%"=="true" (
+    set regediting=false
+    ) else set regediting=true
+) && goto config
 
-    def setup_network_tab(self, layout):
-        button_actions = {
-            "Toggle Network Discovery": self.toggle_network_discovery,
-            "Set DNS to Google": self.set_dns_google,
-            "Set DNS to Cloudflare": self.set_dns_cloudflare,
-            "Check Best DNS": self.check_best_dns,
-            "Toggle QoS": self.toggle_qos,
-            "Change MTU": self.change_mtu,
-            "Reset TCP/IP Stack": self.reset_tcpip_stack,
-        }
+IF /I "%choice%"=="4" ( 
+  if "%debloating%"=="true" (
+    set debloating=false
+    ) else set debloating=true
+) && goto config
 
-        for button_text, action in button_actions.items():
-            button = QPushButton(button_text)
-            button.clicked.connect(action)
-            layout.addWidget(button)
+IF /I "%choice%"=="5" ( 
+  if "%power%"=="true" (
+    set power=false
+    ) else set power=true
+) && goto config
 
-        layout.addStretch()  # Add stretch to push buttons to the top
+IF /I "%choice%"=="6" ( 
+  if "%clock%"=="true" (
+    set clock=false
+    ) else set clock=true
+) && goto config
 
-    def setup_apps_tab(self, layout):
-        file_urls = [
-            "https://github.com/spookyynate/AetherialServices/raw/main/AetherialBooster.bat",
-            # Add more URLs here as needed
-        ]
-        file_names = [
-            "AetherialBooster.bat",
-            # Add more file names here as needed
-        ]
+IF /I "%choice%"=="7" ( 
+  if "%cpugpu%"=="true" (
+    set cpugpu=false
+    ) else set cpugpu=true
+) && goto config
 
-        for url, name in zip(file_urls, file_names):
-            button = QPushButton(f"Download {name}")
-            button.clicked.connect(lambda checked, u=url, n=name: self.download_file(u, n))
-            layout.addWidget(button)
+IF /I "%choice%"=="8" ( 
+  if "%ramtweaks%"=="true" (
+    set ramtweaks=false
+    ) else set ramtweaks=true
+) && goto config
 
-        layout.addStretch()  # Add stretch to push buttons to the top
+IF /I "%choice%"=="9" ( 
+  if "%internetgame%"=="true" (
+    set internetgame=false
+    ) else set internetgame=true
+) && goto config
 
-    def download_file(self, url, file_name):
-        save_path, _ = QFileDialog.getSaveFileName(self, "Save File", file_name, "All Files (*)")
-        if save_path:
-            try:
-                urllib.request.urlretrieve(url, save_path)
-                QMessageBox.information(self, 'Download Complete', f'File saved to: {save_path}')
-            except Exception as e:
-                QMessageBox.warning(self, 'Error', f'Failed to download file: {e}')
+IF /I "%choice%"=="x" Goto start
+IF /I "%choice%"=="X" Goto start
+cls && ECHO This is not a valid option, please try again. && pause && goto config
+pause
 
-    def save_file(self):
-        # Get the directory of the script
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        # Path to the embedded batch file (ensure this file is added to your project)
-        batch_file_path = os.path.join(base_dir, 'AetherialBooster.bat')
+
+
+:Loading
+if %progress%==21 goto EndEN
+if %loadnum%==105 goto EndEN
+chcp 65001 >nul 2>&1
+set load=%load%█
+color 3
+cls
+echo Loading...
+echo ------------------------------------
+echo Progress: %COL%[33m%load%%COL%[92m %loadnum%%%
+echo ------------------------------------
+ping localhost -n 3 >nul 2>&1
+set/a loadnum=%loadnum% +5
+goto %progress%
+goto Loading
+
+:0
+::5%
+
+chcp 437 >nul 2>&1
+echo Creating a Restore Point...
+powershell Enable-ComputerRestore -Drive 'C:\', 'D:\', 'E:\', 'F:\', 'G:\' >nul 2>&1
+powershell Checkpoint-Computer -Description 'Aetherial Services Restore Point' >nul 2>&1
+
+set/a progress=%progress% +1
+goto Loading
+
+:1
+::10%
+
+chcp 437 >nul 2>&1
+if "%fixing%"=="false" goto skipfixing
+echo Fixing your system bugs, this could take a while... 
+sfc /scannow >nul 2>&1
+echo Almost there... 
+DISM /Online /Cleanup-Image /RestoreHealth >nul 2>&1
+
+:skipfixing
+if "%fixing%"=="false" echo Skipping System Fixer...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
+
+:2
+::15%
+
+chcp 437 >nul 2>&1
+if "%cleaning%"=="false" goto skipcleaning
+echo Cleaning Cache and Logs...
+md c:\windows\temp >nul 2>&1
+del c:\windows\logs\cbs\*.log >nul 2>&1
+del C:\Windows\Logs\MoSetup\*.log >nul 2>&1
+del C:\Windows\Panther\*.log /s /q >nul 2>&1
+del C:\Windows\inf\*.log /s /q >nul 2>&1
+del C:\Windows\logs\*.log /s /q >nul 2>&1
+del C:\Windows\SoftwareDistribution\*.log /s /q >nul 2>&1
+del C:\Windows\Microsoft.NET\*.log /s /q >nul 2>&1
+del C:\Users\%USERNAME%\AppData\Local\Microsoft\Windows\WebCache\*.log /s /q >nul 2>&1
+del C:\Users\%USERNAME%\AppData\Local\Microsoft\Windows\SettingSync\*.log /s /q >nul 2>&1
+del C:\Users\%USERNAME%\AppData\Local\Microsoft\Windows\Explorer\ThumbCacheToDelete\*.tmp /s /q >nul 2>&1
+del C:\Users\%USERNAME%\AppData\Local\Microsoft\"Terminal Server Client"\Cache\*.bin /s /q >nul 2>&1
+
+:skipcleaning
+if "%cleaning%"=="false" echo Skipping Log+Cache Cleaner...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1 
+goto Loading
+
+:3
+::20%
+
+chcp 437 >nul 2>&1
+if "%regediting%"=="false" goto skipregediting
+echo Applying Regedits...
+::Remove Windows Ads
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SystemPaneSuggestionsEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+::Priority
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "GPU Priority" /t REG_DWORD /d "8" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "Priority" /t REG_DWORD /d "6" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "Scheduling Category" /t REG_SZ /d "High" /f >nul 2>&1
+::System responsiveness
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d "0" /f >nul 2>&1
+::Activate Game Mode
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d "1" /f >nul 2>&1
+::Remove Windows Game Recording, seriously, just use nvidia or obs for the love of your fps
+reg add "HKEY_CURRENT_USER\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "value" /t REG_DWORD /d "0" /f >nul 2>&1
+::Activate hardware acceleration
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t REG_DWORD /d "2" /f >nul 2>&1
+::Disable transparency
+reg add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "00000000" /f >nul 2>&1
+::Better Privacy
+reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v "AutoDownload" /t REG_DWORD /d 2 /f >nul 2>&1
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v "UseActionCenterExperience" /t REG_DWORD /d "00000000" /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" /v "GlobalUserDisabled" /t REG_DWORD /d 1 /f >nul 2>&1
+::Faster startup
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize" /v "StartupDelayInMSec" /t REG_DWORD /d 0 /f >nul 2>&1
+::Better cache management
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v "CacheHashTableBucketSize" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v "CacheHashTableSize" /t REG_DWORD /d "180" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v "MaxCacheEntryTtlLimit" /t REG_DWORD /d "fa00" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" /v "MaxSOACacheEntryTtlLimit" /t REG_DWORD /d "12d" /f >nul 2>&1
+::Disable Background Apps
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsRunInBackground" /t REG_DWORD /d "2" /f >nul 2>&1
+::Ultra Regedit Compilation
+powershell "ForEach($adapter In Get-NetAdapter){Disable-NetAdapterLso -Name $adapter.Name -ErrorAction SilentlyContinue}" >nul 2>&1
+PowerShell Invoke-WebRequest "https://raw.githubusercontent.com/spookyynate/AetherialServices/main/Booster" -OutFile "%temp%\Regedit.reg" >nul 2>&1
+reg import C:\Users\%USERNAME%\AppData\Local\Temp\Regedit.reg >nul 2>&1
+del %temp%\~Regedit.reg >nul 2>&1
+
+:skipregediting
+if "%regediting%"=="false" echo Skipping Regedits...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
+
+:4
+::25%
+
+chcp 437 >nul 2>&1
+if "%debloating%"=="false" goto skipdebloat
+echo Debloating...
+PowerShell -command "ps onedrive | Stop-Process -Force" >nul 2>&1
+PowerShell -command "start-process "$env:windir\SysWOW64\OneDriveSetup.exe" "/uninstall"" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.Getstarted | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.ZuneVideo | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.ZuneMusic | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.GetHelp | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.Messaging | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.WindowsFeedbackHub | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.People | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.3DBuilder | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.Print3D | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage EclipseManager | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage ActiproSoftwareLLC | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage AdobeSystemsIncorporated.AdobePhotoshopExpress | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage 'D5EA27B7.Duolingo-LearnLanguagesforFree' | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage PandoraMediaInc | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage CandyCrush | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage *Wunderlist* | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage *Flipboard* | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage *Twitter* | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage *Facebook* | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage *Sway* | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage *disney* | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BingTravel | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BingHealthAndFitness | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BingNews | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BingSports | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BingFoodAndDrink | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BingWeather | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BingFinance | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.Office.OneNote | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.MicrosoftOfficeHub | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.MicrosoftSolitaireCollection | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage Microsoft.BioEnrollment | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage ContentDeliveryManager | Remove-AppxPackage" >nul 2>&1
+PowerShell -command "Get-AppxPackage 'Microsoft.Advertising.Xaml' | Remove-AppxPackage" >nul 2>&1
+
+:skipdebloat
+if "%debloating%"=="false" echo Skipping Debloater...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
+
+:5
+::30%
+
+chcp 437 >nul 2>&1
+if "%power%"=="false" goto skippower
+echo Applying Power Plan...
+powercfg -restoredefaultschemes
+powershell Invoke-WebRequest "https://github.com/spookyynate/AetherialServices/raw/main/PowerPlan.pow" -OutFile "C:\TT\PowerPlan.pow"
+cls
+powercfg /d 44444444-4444-4444-4444-444444444449 >nul 2>&1 
+powercfg -import "C:\TT\PowerPlan.pow" 44444444-4444-4444-4444-444444444449 >nul 2>&1 
+powercfg -SETACTIVE "44444444-4444-4444-4444-444444444449" >nul 2>&1 
+powercfg /changename 44444444-4444-4444-4444-444444444449 "HoneCtrl's Power Plan" "The Ultimate Power Plan to increase FPS, improve latency and reduce input lag. (Added by Aetherial Services )" >nul 2>&1 
+::Delete Balanced Plan
+powercfg /d 381b4222-f694-41f0-9685-ff5bb260df2e >nul 2>&1 
+::Delete High Performance Plan
+powercfg /d 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c >nul 2>&1 
+::Delete Power Saving Plan
+powercfg /d a1841308-3541-4fab-bc81-f71556f20b4a >nul 2>&1
+
+:skippower
+if "%power%"=="false" echo Skipping Power Plan Tweaker...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
+
+:6
+::35%
+
+chcp 437 >nul 2>&1
+if "%clock%"=="false" goto skipclock
+echo Activating Clock Resolution Services...
+cd C:\TT\ 
+powershell Invoke-WebRequest "https://cdn.discordapp.com/attachments/798314687321735199/923239120367673434/CLOCKRES.exe" -OutFile "C:\TT\CLOCKRES.exe" >nul 2>&1
+FOR /F "tokens=*" %%g IN ('CLOCKRES.exe ^| find "Current"') do set "currenttimer=%%g"
+powershell Invoke-WebRequest "https://cdn.discordapp.com/attachments/798314687321735199/923239064738627594/SetTimerResolutionService.exe" -OutFile "C:\TT\SetTimerResolutionService.exe"  >nul 2>&1
+sc config "STR" start= auto >nul 2>&1
+NET START STR >nul 2>&1
+bcdedit /set useplatformtick yes >nul 2>&1  
+bcdedit /set disabledynamictick yes >nul 2>&1
+cd C:\TT\ >nul 2>&1
+%windir%\Microsoft.NET\Framework\v4.0.30319\InstallUtil.exe /quiet /s /i SetTimerResolutionService.exe >nul 2>&1
+sc config "STR" start= auto >nul 2>&1
+NET START STR >nul 2>&1
+
+:skipclock
+if "%clock%"=="false" echo Skipping Clock Resolutions Services...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
+
+:7
+::40%
+
+chcp 437 >nul 2>&1
+if "%cpugpu%"=="false" goto skipgpu
+echo Applying GPU Tweaks...
+::This piece of code is half mine, credits to Auraside's HoneCtrl for the other half.
+Reg query "HKLM\System\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" >nul 2>&1 && Reg add "HKLM\System\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t Reg_DWORD /d "2" /f >nul 2>&1
+::Enable gdi hardware acceleration
+for /f %%a in ('Reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class" /v "VgaCompatible" /s ^| findstr "HKEY"') do Reg add "%%a" /v "KMD_EnableGDIAcceleration" /t Reg_DWORD /d "1" /f >nul 2>&1
+::Enable GameMode
+Reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t Reg_DWORD /d "1" /f >nul 2>&1
+Reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t Reg_DWORD /d "1" /f >nul 2>&1
+::FSO
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehaviorMode" /t REG_DWORD /d "2" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehavior" /t REG_DWORD /d "2" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_HonorUserFSEBehaviorMode" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_DXGIHonorFSEWindowsCompatible" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_EFSEFeatureFlags" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_DSEBehavior" /t REG_DWORD /d "2" /f >nul 2>&1
+::Disable GpuEnergyDrv
+Reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv" /v "Start" /t Reg_DWORD /d "4" /f >nul 2>&1
+Reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDr" /v "Start" /t Reg_DWORD /d "4" /f >nul 2>&1
+::Disable Preemption
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler" /v "EnablePreemption" /t Reg_DWORD /d "0" /f >nul 2>&1
+) >nul 2>&1 else (
+Reg delete "HKCU\Software\Hone" /v "AllGPUTweaks" /f >nul 2>&1
+::Enable Hardware Accelerated Scheduling
+reg query "HKLM\System\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" >nul 2>&1 && Reg add "HKLM\System\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t Reg_DWORD /d "2" /f >nul 2>&1
+::Disable gdi hardware acceleration
+for /f %%a in ('Reg query "HKLM\SYSTEM\CurrentControlSet\Control\Class" /v "VgaCompatible" /s ^| findstr "HKEY"') do Reg delete "%%a" /v "KMD_EnableGDIAcceleration" /f >nul 2>&1
+::Enable GameMode
+Reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t Reg_DWORD /d "1" /f >nul 2>&1
+Reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t Reg_DWORD /d "1" /f >nul 2>&1
+::FSO
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehaviorMode" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehavior" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_HonorUserFSEBehaviorMode" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_DXGIHonorFSEWindowsCompatible" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_EFSEFeatureFlags" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore" /v "GameDVR_DSEBehavior" /f >nul 2>&1
+::Disable GpuEnergyDrv
+Reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv" /v "Start" /t Reg_DWORD /d "2" /f >nul 2>&1
+Reg add "HKLM\SYSTEM\CurrentControlSet\Services\GpuEnergyDr" /v "Start" /t Reg_DWORD /d "2" /f >nul 2>&1
+::Disable Preemption
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers\Scheduler" /v "EnablePreemption" /t Reg_DWORD /d "1" /f >nul 2>&1
+)
+
+:skipgpu
+if "%cpugpu%"=="false" echo Skipping GPU Tweaks...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
+
+:8
+::45%
+
+chcp 437 >nul 2>&1
+if "%cpugpu%"=="false" goto skipcpu
+echo Applying CPU Tweaks...
+powershell Invoke-WebRequest "https://raw.githubusercontent.com/spookyynate/AetherialServices/main/CPUTweaks" -OutFile "C:\TT\CPUTweaks"
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& 'C:\TT\CPUTweaks.ps1'"
+:skipcpu
+if "%cpugpu%"=="false" echo Skipping CPU Tweaks...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
+
+:9
+::50%
+chcp 437 >nul 2>&1
+if "%ramtweaks%"=="false" goto skipmemtweaks
+echo Applying RAM Tweaks...
+set "mem="
+    for /f "tokens=2 delims==" %%a in (
+      'wmic computersystem get totalphysicalmemory /value'
+    ) do for /f "delims=" %%b in (
+      "%%~a"
+    ) do if not defined mem set "mem=%%~b"
+
+::  At this point %mem% is the memory size in bytes. In order to convert to
+::  mebibytes we need to divide by 2^20. However, set /a cannot work with
+::  numbers greater than 2^31-1; we first convert to decimal megabytes and then
+::  multiply by 0.95346.
+::  (This will underestimate the mebibytes a little, by about 0.025%.)
+
+    set "memMB=%mem:~0,-6%"
+    set /a "mem=((memMB-memMB/21) + (memMB-memMB/22))/2"
+    set /a "pfile=((%mem%) + (%mem% / 2))"
+    if %pfile% GTR 16384 set %pfile%=16384
+    reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "PagingFiles" /t REG_MULTI_SZ /D "c:\pagefile.sys %pfile% %pfile%" /f >nul 2>&1
+    reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "SystemPages" /t REG_DWORD /D "0" /f >nul 2>&1
+
     
-        # Ask the user where to save the file
-        options = QFileDialog.Options()
-        save_path, _ = QFileDialog.getSaveFileName(self, "Save Batch File", "", "Batch Files (*.bat);;All Files (*)", options=options)
-    
-        if save_path:
-            shutil.copy(batch_file_path, save_path)
-            QMessageBox.information(self, 'File Saved', f'Batch file saved to: {save_path}')
+for /f "tokens=2 delims==" %%i in ('wmic os get TotalVisibleMemorySize /format:value') do set /a mem=%%i
+set /a mem=%mem% + 1024000
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control" /v "SvcHostSplitThresholdInKB" /t REG_DWORD /d %mem% /f >nul 2>&1
+::Disable FTH
+Reg add "HKLM\Software\Microsoft\FTH" /v "Enabled" /t Reg_DWORD /d "0" /f >nul 2>&1
+::Disable Desktop Composition
+Reg add "HKCU\Software\Microsoft\Windows\DWM" /v "Composition" /t REG_DWORD /d "0" /f >nul 2>&1
+::Disable Background apps
+Reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" /v "GlobalUserDisabled" /t Reg_DWORD /d "1" /f >nul 2>&1
+Reg add "HKLM\Software\Policies\Microsoft\Windows\AppPrivacy" /v "LetAppsRunInBackground" /t Reg_DWORD /d "2" /f >nul 2>&1
+Reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "BackgroundAppGlobalToggle" /t Reg_DWORD /d "0" /f >nul 2>&1
+::Disallow drivers to get paged into virtual memory
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "DisablePagingExecutive" /t Reg_DWORD /d "1" /f >nul 2>&1
+::Disable Page Combining and Memory Compression
+Reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management" /v "DisablePageCombining" /t REG_DWORD /d "1" /f >nul 2>&1
+::Use Large System Cache to improve microstuttering
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v "LargeSystemCache" /t Reg_DWORD /d "1" /f >nul 2>&1
+::Free unused ram
+Reg add "HKLM\System\CurrentControlSet\Control\Session Manager" /v "HeapDeCommitFreeBlockThreshold" /t REG_DWORD /d "262144" /f >nul 2>&1
+::Auto restart Powershell on error
+Reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v "AutoRestartShell" /t REG_DWORD /d "1" /f >nul 2>&1
+::Disk Optimizations
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v "DontVerifyRandomDrivers" /t REG_DWORD /d "1" /f >nul 2>&1
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v "LongPathsEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+::Disable Prefetch and Superfetch
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v "EnablePrefetcher" /t Reg_DWORD /d "0" /f >nul 2>&1
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /v "EnableSuperfetch" /t Reg_DWORD /d "0" /f >nul 2>&1
+::Disable Hibernation + Fast Startup
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power" /v "HiberbootEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HibernateEnabledDefault" /t REG_DWORD /d "0" /f >nul 2>&1
+Reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HibernateEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+::Wait time to kill app during shutdown
+Reg add "HKCU\Control Panel\Desktop" /v "WaitToKillAppTimeout" /t Reg_SZ /d "1000" /f >nul 2>&1
+::Wait to end service at shutdown
+Reg add "HKLM\System\CurrentControlSet\Control" /v "WaitToKillServiceTimeout" /t Reg_SZ /d "1000" /f >nul 2>&1
+::Wait to kill non-responding app
+Reg add "HKCU\Control Panel\Desktop" /v "HungAppTimeout" /t Reg_SZ /d "1000" /f >nul 2>&1
+::fsutil
+if exist "%windir%\System32\fsutil.exe" ( 
+	::Raise the limit of paged pool memory
+	fsutil behavior set memoryusage 2 >nul 2>&1
+	::https://www.serverbrain.org/solutions-2003/the-mft-zone-can-be-optimized.html
+	fsutil behavior set mftzone 2 >nul 2>&1
+	::Disable Last Access information on directories, performance/privacy
+	fsutil behavior set disablelastaccess 1 >nul 2>&1
+	::Disable Virtual Memory Pagefile Encryption
+	fsutil behavior set encryptpagingfile 0 >nul 2>&1
+	::Disables the creation of legacy 8.3 character-length file names on FAT- and NTFS-formatted volumes.
+	fsutil behavior set disable8dot3 1 >nul 2>&1
+	::Disable NTFS compression
+	fsutil behavior set disablecompression 1 >nul 2>&1
+	::Enable Trim
+	fsutil behavior set disabledeletenotify 0) >nul 2>&1 else goto pass
+:pass
 
-    def run_command(self, command):
-        try:
-            subprocess.run(command, shell=True, check=True)
-        except subprocess.CalledProcessError as e:
-            QMessageBox.warning(self, 'Error', f'An error occurred: {e}')
+:skipmemtweaks
+if "%ramtweaks%"=="false" echo Skipping Memory Tweaks...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def enable_ultimate_performance_mode(self):
-        self.run_command("powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61")
-        QMessageBox.information(self, 'ULTIMATE PERFORMANCE MODE', 'ULTIMATE PERFORMANCE MODE enabled.')
+:10
+::55%
+chcp 437 >nul 2>&1
+if "%internetgame%"=="false" goto skipinternet
+echo Internet Cache Cleaning
+ipconfig /release >nul 2>&1
+ipconfig /renew >nul 2>&1
+arp -d * >nul 2>&1
+nbtstat -R >nul 2>&1
+nbtstat -RR >nul 2>&1
+ipconfig /flushdns >nul 2>&1
+ipconfig /registerdns >nul 2>&1
+netsh int tcp set global autotuninglevel=normal >nul 2>&1
+netsh interface 6to4 set state disabled >nul 2>&1
+netsh int isatap set state disable >nul 2>&1
+netsh int tcp set global timestamps=disabled >nul 2>&1
+netsh int tcp set heuristics disabled >nul 2>&1
+netsh int tcp set global chimney=disabled >nul 2>&1
+netsh int tcp set global ecncapability=disabled >nul 2>&1
+netsh int tcp set global rsc=enabled >nul 2>&1
+netsh int tcp set global nonsackrttresiliency=disabled >nul 2>&1
+netsh int tcp set security mpp=disabled >nul 2>&1
+netsh int tcp set security profiles=disabled >nul 2>&1
+netsh int ip set global icmpredirects=disabled >nul 2>&1
+netsh int tcp set security mpp=disabled profiles=disabled >nul 2>&1
+netsh int ip set global multicastforwarding=disabled >nul 2>&1
+netsh int tcp set supplemental internet congestionprovider=ctcp >nul 2>&1
+netsh interface teredo set state disabled >nul 2>&1
+netsh winsock reset >nul 2>&1
+netsh int isatap set state disable >nul 2>&1
+netsh int ip set global taskoffload=disabled >nul 2>&1
+netsh int ip set global neighborcachelimit=4096 >nul 2>&1
+netsh int tcp set global dca=enabled >nul 2>&1
+netsh int tcp set global netdma=enabled >nul 2>&1
+PowerShell Disable-NetAdapterLso -Name "*" >nul 2>&1
 
-    def toggle_transparency(self):
-        self.run_command("reg add \"HKCU\\Software\\Microsoft\\Windows\\DWM\" /v \"EnableTransparency\" /t REG_DWORD /d 0 /f")
-        QMessageBox.information(self, 'Transparency', 'Transparency toggled off.')
+:skipinternet
+if "%internetgame%"=="false" echo Skipping Internet Cache Cleaning...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def clear_temporary_files(self):
-        self.run_command("del /q /f %temp%\\*")
-        QMessageBox.information(self, 'Temporary Files', 'Temporary files cleared.')
+:11
+::60%
+chcp 437 >nul 2>&1
+if "%internetgame%"=="false" goto skipinternet2
+echo Activating MTU Tweaks + Google DNS
+set MTU=1473
+set LASTGOOD=0
+set LASTBAD=65536
+set PACKETSIZE=28
+set SERVER=google.com
+::Check server reachability.
+ping -n 1 -l 0 -f -4 google.com >nul 2>&1
+if !ERRORLEVEL! NEQ 0 (
+  goto :error
+)
+::Start looking for the maximum MTU.
+:seek
+ping -n 1 -l !MTU! -f -4 !SERVER! 1>nul
+if !ERRORLEVEL! EQU 0 (
+  set /A LASTGOOD=!MTU!
+  set /A "MTU=(!MTU! + !LASTBAD!) / 2"
+  if !MTU! NEQ !LASTGOOD! goto :seek
+) else (
+  set /A LASTBAD=!MTU!  
+  set /A "MTU=(!MTU! + !LASTGOOD!) / 2"
+  if !MTU! NEQ !LASTBAD! goto :seek
+)
+rem Print the result.
+set /A "MAXMTU=!LASTGOOD! + !PACKETSIZE!"
+rem Export %MAXMTU% variable.
+set MAXMTU=%MAXMTU%
+goto MTUWorks
 
-    def disable_startup_programs(self):
-        self.run_command("wmic startup get caption,command")
-        QMessageBox.information(self, 'Startup Programs', 'List of startup programs shown in console. Use the Task Manager to disable them.')
+:error
+rem When something unexpected occurs.
+set MAXMTU=-1
 
-    def increase_system_performance(self):
-        self.run_command("powercfg -change -monitor-timeout-ac 1")
-        QMessageBox.information(self, 'System Performance', 'System performance optimized for power saving.')
+:MTUworks
+wmic nicconfig where (IPEnabled=TRUE) call SetDNSServerSearchOrder ("8.8.8.8", "8.8.4.4") >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "ActiveDnsProbeContent" /t REG_SZ /d "8.8.4.4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "ActiveDnsProbeContentV6" /t REG_SZ /d "2001:4860:4860::8844" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "ActiveDnsProbeHost" /t REG_SZ /d "dns.google" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "ActiveDnsProbeHostV6" /t REG_SZ /d "dns.google" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "ActiveWebProbeHost" /t REG_SZ /d "www.msftconnecttest.com" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "EnableActiveProbing" /t REG_DWORD /d "1" /f >nul 2>&1
 
-    def toggle_firewall(self):
-        if self.firewall_enabled:
-            self.run_command("netsh advfirewall set allprofiles state off")
-            self.firewall_enabled = False
-            status = 'disabled'
-        else:
-            self.run_command("netsh advfirewall set allprofiles state on")
-            self.firewall_enabled = True
-            status = 'enabled'
-        QMessageBox.information(self, 'Firewall', f'Firewall {status}.')
+:skipinternet2
+if "%internetgame%"=="false" echo Skipping MTU+DNS Tweaks
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def optimize_disk_performance(self):
-        self.run_command("defrag C: /O /H")
-        QMessageBox.information(self, 'Disk Optimization', 'Disk optimized.')
+:12
+chcp 437 >nul 2>&1
+if "%debloating%"=="false" goto skipservices
+echo Activating Service Tweaks...
+::This piece of code is half mine, credits to Auraside's HoneCtrl for the other half.
 
-    def clean_up_system_files(self):
-        self.run_command("cleanmgr /sagerun:1")
-        QMessageBox.information(self, 'System Files Cleanup', 'System files cleanup initiated.')
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\xbgm" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\XboxGipSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\spectrum" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wcncsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WebClient" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SysMain" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NcaSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UserDataSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\stisvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AdobeFlashPlayerUpdateSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1 
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TrkWks" /v "Start" /t REG_DWORD /d "4" /f  >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\dmwappushservice" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1  
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PimIndexMaintenanceSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DiagTrack" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\GoogleChromeElevationService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\OneSyncSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ibtsiva" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMPTRAP" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\pla" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\ssh-agent" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\sshd" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DoSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WbioSrvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PcaSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NetTcpPortSharing" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wersvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\gupdate" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\gupdatem" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MSiSCSI" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WMPNetworkSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CDPUserSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UnistoreSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\debugregsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Ndu" /v "Start" /d "2" /t REG_DWORD /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TimeBrokerSvc" /v "Start" /d "3" /t REG_DWORD /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\VaultSvc" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wuauserv" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
+Reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\CertPropSvc" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
 
-    def manage_system_services(self):
-        self.run_command("services.msc")
-        QMessageBox.information(self, 'System Services', 'System Services window opened.')
+:skipservices
+if "%debloating%"=="false" echo Skipping Services Optimization...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def adjust_visual_effects(self):
-        self.run_command("SystemPropertiesPerformance")
-        QMessageBox.information(self, 'Visual Effects', 'Visual Effects settings opened.')
+:13
+chcp 437 >nul 2>&1
+if "%internetgame%"=="false" goto skipgametweaks
+echo Applying Game Specific Tweaks...
+TaskKill /F /IM javaw.exe >nul 2>&1 
+cd %appdata%\.minecraft >nul 2>&1
+if %errorlevel% == 1 (
+  goto nomine
+)
+powershell -Command "(Get-Content options.txt) -replace 'gamma:\d+.\d+', 'gamma:10.0' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'renderDistance:\d+', 'renderDistance:2' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'particles:\d+', 'particles:2' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'anaglyph3d:true', 'anaglyph3d:false' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'maxFps:\d+', 'maxFps:9999' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'graphicsMode:\d+', 'graphicsMode:0' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'anaglyph3d:true', 'anaglyph3d:false' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'fboEnable:false', 'fboEnable:true' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'fancyGraphics:true', 'fancyGraphics:false' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'renderClouds:true', 'renderClouds:false' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'snooperEnabled:false', 'snooperEnabled:true' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'useVbo:false', 'useVbo:true' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'advancedItemTooltips:false', 'advancedItemTooltips:true' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'heldItemTooltips:false', 'advancedItemTooltips:true' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'ao:\d+', 'ao:0' | Out-File -encoding default options.txt" >nul 2>&1
+powershell -Command "(Get-Content options.txt) -replace 'soundCategory_music:\d+', 'soundCategory_music:0' | Out-File -encoding default options.txt" >nul 2>&1
+::Optifine Options
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofFogType:\d+', 'ofFogType:3' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofFogStart:\d+', 'ofFogStart:0.6' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofMipmapType:\d+', 'ofMipmapType:3' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofOcclusionFancy:true', 'ofOcclusionFancy:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofSmoothFps:true', 'ofSmoothFps:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofSmoothWorld:true', 'ofSmoothWorld:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAoLevel:\d+', 'ofAoLevel:0' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofClouds:\d+', 'ofClouds:3' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofCloudsHeight:\d+', 'ofCloudsHeight:0' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofTrees:\d+', 'ofTrees:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofDroppedItems:\d+', 'ofDroppedItems:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofRain:\d+', 'ofRain:3' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedWater:\d+', 'ofAnimatedWater:0' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedLava:\d+', 'ofAnimatedLava:0' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedFire:false', 'ofAnimatedFire:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedPortal:false', 'ofAnimatedPortal:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedRedstone:false', 'ofAnimatedRedstone:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedExplosion:false', 'ofAnimatedExplosion:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedFlame:false', 'ofAnimatedFlame:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedSmoke:false', 'ofAnimatedSmoke:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofVoidParticles:false', 'ofVoidParticles:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofWaterParticles:false', 'ofWaterParticles:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofPotionParticles:false', 'ofPotionParticles:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofFireworkParticles:false', 'ofFireworkParticles:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofDrippingWaterLava:false', 'ofDrippingWaterLava:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedTerrain:false', 'ofAnimatedTerrain:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAnimatedTextures:false', 'ofAnimatedTextures:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofRainSplash:true', 'ofRainSplash:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofLagometer:true', 'ofLagometer:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofShowFps:true', 'ofShowFps:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAutoSaveTicks:\d+', 'ofAutoSaveTicks:4000' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofBetterGrass:\d+', 'ofBetterGrass:3' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofConnectedTextures:\d+', 'ofConnectedTextures:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofWeather:false', 'ofWeather:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofSky:true', 'ofSky:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofStars:true', 'ofStars:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofSunMoon:true', 'ofSunMoon:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofVignette:\d+', 'ofVignette:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofChunkUpdates:\d+', 'ofChunkUpdates:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofChunkUpdatesDynamic:true', 'ofChunkUpdatesDynamic:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofTime:\d+', 'ofTime:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAaLevel:\d+', 'ofAaLevel:0' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAfLevel:\d+', 'ofAfLevel:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofProfiler:true', 'ofProfiler:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofBetterSnow:true', 'ofBetterSnow:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofSwampColors:true', 'ofSwampColors:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofRandomEntities:true', 'ofRandomEntities:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofCustomFonts:false', 'ofCustomFonts:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofCustomColors:false', 'ofCustomColors:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofCustomItems:false', 'ofCustomItems:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofCustomSky:false', 'ofCustomSky:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofShowCapes:false', 'ofShowCapes:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofNaturalTextures:true', 'ofNaturalTextures:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofEmissiveTextures:false', 'ofEmissiveTextures:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofLazyChunkLoading:false', 'ofLazyChunkLoading:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofRenderRegions:false', 'ofRenderRegions:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofSmartAnimations:true', 'ofSmartAnimations:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofDynamicFov:false', 'ofDynamicFov:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofAlternateBlocks:true', 'ofAlternateBlocks:false' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofDynamicLights:\d+', 'ofDynamicLights:3' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofScreenshotSize:\d+', 'ofScreenshotSize:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofCustomEntityModels:false', 'ofCustomEntityModels:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofCustomGuis:false', 'ofCustomGuis:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofShowGlErrors:false', 'ofShowGlErrors:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofFastMath:false', 'ofFastMath:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofFastRender:false', 'ofFastRender:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofTranslucentBlocks:\d+', 'ofTranslucentBlocks:1' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofChatBackground:\d+', 'ofChatBackground:0' | Out-File -encoding default optionsof.txt" >nul 2>&1
+powershell -Command "(Get-Content optionsof.txt) -replace 'ofChatShadow:false', 'ofChatShadow:true' | Out-File -encoding default optionsof.txt" >nul 2>&1
+:nomine
+::Valorant (not tested code)
+cd C:\Users\%USERNAME%\AppData\Local\VALORANT\Saved\Config >nul 2>&1
+if %errorlevel% == 1 (
+  goto noval
+)
+PowerShell Invoke-WebRequest "https://raw.githubusercontent.com/Teramanbr/TerabyteTweaker/main/src/VALORANT.ps1" -OutFile "C:\TT\VALORANT.ps1" >nul 2>&1
+for /d %%a in (*) do cd "C:\Users\%USERNAME%\AppData\Local\VALORANT\Saved\Config\%%~a" &&PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& 'C:\TT\VALORANT.ps1'" /b >nul 2>&1
+:noval
+::Steam Game Tweaks
+:: =========================================================================================================================================== ::
+cd "C:\Program Files (x86)\Steam\userdata"
+if %errorlevel% == 1 (
+  goto nosteam
+)
+powershell.exe Invoke-WebRequest "https://raw.githubusercontent.com/Teramanbr/TerabyteTweaker/main/src/SteamInit.ps1" -OutFile "C:\TT\SteamInit.ps1" >nul 2>&1
+for /d %%a in (*) do cd "C:\Program Files (x86)\Steam\userdata\%%~a\config\Windows" &&PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& 'C:\TT\SteamInit.ps1'" &&cd ..\.. >nul 2>&1
+:nosteam
 
-    def disable_hibernation(self):
-        self.run_command("powercfg /hibernate off")
-        QMessageBox.information(self, 'Hibernation', 'Hibernation disabled.')
+::back to windows folder
+cd C:\Windows\System32 >nul 2>&1
 
-    def disable_superfetch(self):
-        self.run_command("sc stop \"SysMain\"")
-        self.run_command("sc config \"SysMain\" start=disabled")
-        QMessageBox.information(self, 'Superfetch', 'Superfetch disabled.')
+:skipgametweaks
+if "%internetgame%"=="false" echo Skipping Game Specific Tweaks...
+ping 127.0.0.1 -n 3 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def clear_dns_cache(self):
-        self.run_command("ipconfig /flushdns")
-        QMessageBox.information(self, 'DNS Cache', 'DNS cache cleared.')
+:14
+chcp 437 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def increase_virtual_memory(self):
-        self.run_command("SystemPropertiesPerformance")
-        QMessageBox.information(self, 'Virtual Memory', 'Virtual memory settings opened.')
+:15
+chcp 437 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def set_high_performance_mode(self):
-        self.run_command("powercfg -setactive SCHEME_MIN")
-        QMessageBox.information(self, 'High Performance Mode', 'High performance power plan activated.')
+:16
+chcp 437 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def disable_windows_tips(self):
-        self.run_command("reg add \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications\" /v \"ToastEnabled\" /t REG_DWORD /d 0 /f")
-        QMessageBox.information(self, 'Windows Tips', 'Windows tips disabled.')
+:17
+chcp 437 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def toggle_search_indexing(self):
-        if self.search_indexing_enabled:
-            self.run_command("sc stop \"WSearch\"")
-            self.search_indexing_enabled = False
-            status = 'disabled'
-        else:
-            self.run_command("sc start \"WSearch\"")
-            self.search_indexing_enabled = True
-            status = 'enabled'
-        QMessageBox.information(self, 'Search Indexing', f'Search indexing {status}.')
+:18
+chcp 437 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def optimize_windows_defender(self):
-        self.run_command("powershell -Command \"Set-MpPreference -DisableRealtimeMonitoring $true\"")
-        QMessageBox.information(self, 'Windows Defender', 'Windows Defender optimized.')
+:19
+chcp 437 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def disable_cortana(self):
-        self.run_command("reg add \"HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search\" /v \"AllowCortana\" /t REG_DWORD /d 0 /f")
-        QMessageBox.information(self, 'Cortana', 'Cortana disabled.')
+:20
+chcp 437 >nul 2>&1
+set/a progress=%progress% +1
+goto Loading
 
-    def disable_windows_error_reporting(self):
-        self.run_command("reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\" /v \"Disabled\" /t REG_DWORD /d 1 /f")
-        QMessageBox.information(self, 'Error Reporting', 'Windows Error Reporting disabled.')
 
-    def disable_automatic_updates(self):
-        self.run_command("sc config wuauserv start=disabled")
-        QMessageBox.information(self, 'Automatic Updates', 'Automatic updates disabled.')
-
-    def disable_defender_realtime_protection(self):
-        self.run_command("powershell -Command \"Set-MpPreference -DisableRealtimeMonitoring $true\"")
-        QMessageBox.information(self, 'Defender Real-time Protection', 'Defender real-time protection disabled.')
-
-    def disable_background_apps(self):
-        self.run_command("powershell -Command \"Get-AppxPackage | Remove-AppxPackage\"")
-        QMessageBox.information(self, 'Background Apps', 'Background apps disabled.')
-
-    def toggle_network_discovery(self):
-        if self.network_discovery_enabled:
-            self.run_command("reg add \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\NetCache\" /v \"EnableDiscovery\" /t REG_DWORD /d 0 /f")
-            self.network_discovery_enabled = False
-            status = 'disabled'
-        else:
-            self.run_command("reg add \"HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\NetCache\" /v \"EnableDiscovery\" /t REG_DWORD /d 1 /f")
-            self.network_discovery_enabled = True
-            status = 'enabled'
-        QMessageBox.information(self, 'Network Discovery', f'Network discovery {status}.')
-
-    def set_dns_google(self):
-        self.run_command("netsh interface ip set dns name=\"Wi-Fi\" static 8.8.8.8")
-        QMessageBox.information(self, 'DNS', 'DNS set to Google (8.8.8.8).')
-
-    def set_dns_cloudflare(self):
-        self.run_command("netsh interface ip set dns name=\"Wi-Fi\" static 1.1.1.1")
-        QMessageBox.information(self, 'DNS', 'DNS set to Cloudflare (1.1.1.1).')
-
-    def check_best_dns(self):
-        self.run_command("powershell -Command \"Test-Connection 1.1.1.1 -Count 1\"")
-        self.run_command("powershell -Command \"Test-Connection 8.8.8.8 -Count 1\"")
-        QMessageBox.information(self, 'DNS Check', 'Checked DNS servers. Review output for best DNS.')
-
-    def toggle_qos(self):
-        self.run_command("netsh interface ipv4 set global dsc=enable")
-        QMessageBox.information(self, 'QoS', 'QoS settings toggled.')
-
-    def change_mtu(self):
-        self.run_command("netsh interface ipv4 set subinterface \"Wi-Fi\" mtu=1500 store=persistent")
-        QMessageBox.information(self, 'MTU', 'MTU changed to 1500.')
-
-    def reset_tcpip_stack(self):
-        self.run_command("netsh int ip reset")
-        QMessageBox.information(self, 'TCP/IP Stack', 'TCP/IP stack reset.')
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = PerformanceOptimizer()
-    window.show()
-    sys.exit(app.exec_())
+:EndEN
+powershell Invoke-WebRequest "https://raw.githubusercontent.com/Teramanbr/TerabyteTweaker/main/src/thanksforusing.bat" -OutFile "C:\TT\thanksforusing.bat"
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce" /v "ThanksForUsing" /t REG_SZ /d C:\TT\thanksforusing.bat /f >nul 2>&1
+PowerShell Invoke-WebRequest "https://raw.githubusercontent.com/Teramanbr/TerabyteTweaker/main/src/shutdown.ps1" -OutFile "C:\TT\shutdown.ps1" >nul 2>&1
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& 'C:\TT\shutdown.ps1'" >nul 2>&1
+cls
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo                      %COL%[33mPc tweaked successfully! Wait 5 minutes for the computer to restart
+echo                                         or press any button to restart it now!
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+echo.
+shutdown /r /t 500 -c " "
+pause
+shutdown /r /t 0
